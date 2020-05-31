@@ -3070,7 +3070,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ModuleType: ipa
-  ModuleDisplayName: I.P.A.
+  ModuleDisplayName: IPA
   RequiresTimerVisibility: 0
 --- !u!114 &114237499118277832
 MonoBehaviour:
