@@ -116,10 +116,18 @@ public class ipa : MonoBehaviour
         for (int i = 0; i < 9; i++)
         {
             buttonTexts[buttonNumbers[i]].text = (buttonNumbers[i] == solution) ? symbols[soundPresent] : symbols[decoys[decoyCount]];
-            if (new string[] { "sʼ", "pʼ", "tʼ", "kʼ" }.Contains(buttonTexts[buttonNumbers[i]].text))
-                buttonTexts[i].transform.localScale = new Vector3(.0003f, .0003f, .0003f);
-            else
-                buttonTexts[i].transform.localScale = new Vector3(.0005f, .0005f, .0005f);
+            switch (buttonTexts[buttonNumbers[i]].text)
+            {
+                case "sʼ":
+                case "pʼ":
+                case "tʼ":
+                case "kʼ":
+                    buttonTexts[buttonNumbers[i]].transform.localScale = new Vector3(.0003f, .0003f, .0003f);
+                    break;
+                default:
+                    buttonTexts[buttonNumbers[i]].transform.localScale = new Vector3(.0005f, .0005f, .0005f);
+                    break;
+            }
             audio.PlaySoundAtTransform("tick", buttons[buttonNumbers[i]].transform);
             if (buttonNumbers[i] != solution)
                 decoyCount++;
