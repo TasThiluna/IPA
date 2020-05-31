@@ -52,7 +52,7 @@ public class ipa : MonoBehaviour
         cap = !settings.hardMode ? 44 : 71;
         if (settings.hardMode)
         {
-            Debug.LogFormat("[I.P.A. #{0}] Hard mode is active!", moduleId);
+            Debug.LogFormat("[IPA #{0}] Hard mode is active!", moduleId);
             playRenderer.material.color = red;
         }
         GenerateAnswer();
@@ -62,7 +62,7 @@ public class ipa : MonoBehaviour
     {
         solution = rnd.Range(0, 9);
         soundPresent = rnd.Range(0, cap);
-        Debug.LogFormat("[I.P.A. #{0}] The sound being played corresponds to the symbol {1}. This symbol is on the {2} button.", moduleId, symbols[soundPresent], positionNames[solution]);
+        Debug.LogFormat("[IPA #{0}] The sound being played corresponds to the symbol {1}. This symbol is on the {2} button.", moduleId, symbols[soundPresent], positionNames[solution]);
     }
 
     void PressButton()
@@ -88,18 +88,18 @@ public class ipa : MonoBehaviour
         if (moduleSolved || cantInteract)
             return;
         var ix = Array.IndexOf(buttons, button);
-        Debug.LogFormat("[I.P.A. #{0}] You pressed the {1} button, which has the symbol {2}.", moduleId, positionNames[ix], buttonTexts[ix].text);
+        Debug.LogFormat("[IPA #{0}] You pressed the {1} button, which has the symbol {2}.", moduleId, positionNames[ix], buttonTexts[ix].text);
         if (ix != solution)
         {
             module.HandleStrike();
-            Debug.LogFormat("[I.P.A. #{0}] That was incorrect. Strike! Resetting...", moduleId);
+            Debug.LogFormat("[IPA #{0}] That was incorrect. Strike! Resetting...", moduleId);
             GenerateAnswer();
             StartCoroutine(HideText(false));
         }
         else
         {
             module.HandlePass();
-            Debug.LogFormat("[I.P.A. #{0}] That was correct. Module solved!", moduleId);
+            Debug.LogFormat("[IPA #{0}] That was correct. Module solved!", moduleId);
             moduleSolved = true;
             StartCoroutine(HideText(true));
         }
@@ -209,7 +209,7 @@ public class ipa : MonoBehaviour
         new Dictionary<string, object>
         {
             { "Filename", "IpaSettings.json" },
-            { "Name", "I.P.A." },
+            { "Name", "IPA" },
             {
                 "Listing", new List<Dictionary<string, object>>
                 {
