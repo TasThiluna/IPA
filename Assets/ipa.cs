@@ -23,7 +23,7 @@ public class ipa : MonoBehaviour
     private int soundPresent;
 
     private static readonly string[] symbols = new string[] { "p", "b", "t", "d", "c", "ɟ", "k", "g", "q", "ɢ", "ʔ", "m", "n", "ɲ", "ŋ", "ʙ", "r", "ʀ", "ⱱ", "ɾ", "f", "v", "θ", "ð", "s", "z", "ʂ", "ʐ", "x", "ɣ", "h", "ɦ", "ʋ", "ɻ", "j", "ɭ", "ʎ", "ǀ", "ɓ", "ɗ", "ʛ", "pʼ", "tʼ", "kʼ", "ʈ", "ɖ", "ɱ", "ɳ", "ɴ", "ɽ", "ɸ", "β", "ç", "ʝ", "χ", "ʁ", "ħ",  "ʕ", "ɬ", "ɮ", "ɹ", "ɰ", "l", "ʟ", "ʘ", "ǃ", "ǂ", "ǁ", "ʄ", "ɠ", "sʼ" };
-    private static readonly string[] positionNames = new string[] { "top-left", "top-middle", "top-right", "middle-left", "middle-middle", "middle-right", "bottom-left", "bottom-middle", "bottom-right" };
+    private static readonly string[] positionNames = new string[9] { "top-left", "top-middle", "top-right", "middle-left", "middle-middle", "middle-right", "bottom-left", "bottom-middle", "bottom-right" };
     private IpaSettings settings = new IpaSettings();
     private int cap;
     private bool cantPlay = true;
@@ -157,38 +157,34 @@ public class ipa : MonoBehaviour
 
     // Twitch Plays
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = "!{0} play [Plays the sound] | !{0} press <pos> [Presses the button in that position. Valid positions are TL, TM, TR, ML, MM, MR, BL, BM, and BR.]";
+    private readonly string TwitchHelpMessage = "!{0} <tl/1> [Presses the button in that direction, or in that position in reading order.] !{0} play [Pressed the play button.]";
     #pragma warning restore 414
 
-    IEnumerator ProcessTwitchCommand(string input)
+    KMSelectable[] ProcessTwitchCommand(string command)
     {
-        var inputs = new string[] { "tl", "tm", "tr", "ml", "mm", "mr", "bl", "bm", "br" };
-        var cmd = input.ToLowerInvariant();
-        var cmdAr = cmd.Split(' ').ToArray();
-        if (cmd == "play")
+        var btns = new List<KMSelectable>();
+        foreach (var cmd in command.ToLowerInvariant().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
         {
-            if (cantPlay)
+            switch (cmd.Replace("center", "middle").Replace("centre", "middle"))
             {
-                yield return "sendtochaterror The play button cannot be pressed right now.";
-                yield break;
+                case "tl": case "lt": case "topleft": case "lefttop": case "1": btns.Add(buttons[0]); break;
+                case "tm": case "tc": case "mt": case "ct": case "topmiddle": case "middletop": case "2": btns.Add(buttons[1]); break;
+                case "tr": case "rt": case "topright": case "righttop": case "3": btns.Add(buttons[2]); break;
+
+                case "ml": case "cl": case "lm": case "lc": case "middleleft": case "leftmiddle": case "4": btns.Add(buttons[3]); break;
+                case "mm": case "cm": case "mc": case "cc": case "middle": case "middlemiddle": case "5": btns.Add(buttons[4]); break;
+                case "mr": case "cr": case "rm": case "rc": case "middleright": case "rightmiddle": case "6": btns.Add(buttons[5]); break;
+
+                case "bl": case "lb": case "bottomleft": case "leftbottom": case "7": btns.Add(buttons[6]); break;
+                case "bm": case "bc": case "mb": case "cb": case "bottommiddle": case "middlebottom": case "8": btns.Add(buttons[7]); break;
+                case "br": case "rb": case "bottomright": case "rightbottom": case "9": btns.Add(buttons[8]); break;
+
+                case "play": case "0": btns.Add(playButton); break;
+
+                default: return null;
             }
-            yield return null;
-            playButton.OnInteract();
         }
-        else if (cmdAr.Length == 2)
-        {
-            if (cmdAr[0] != "press" && !inputs.Any(x => x == cmdAr[1]))
-                yield break;
-            if (cantInteract)
-            {
-                yield return "sendtochaterror A button cannot be pressed right now.";
-                yield break;
-            }
-            yield return null;
-            buttons[Array.IndexOf(inputs, cmdAr[1])].OnInteract();
-        }
-        else
-            yield break;
+        return btns.ToArray();
     }
 
     IEnumerator TwitchHandleForcedSolve()
