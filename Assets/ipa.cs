@@ -38,7 +38,7 @@ public class ipa : MonoBehaviour
         ModConfig<IpaSettings> modConfig = new ModConfig<IpaSettings>("IpaSettings");
         settings = modConfig.Settings;
         modConfig.Settings = settings;
-        moduleId = moduleIdCounter++; // blah blah
+        moduleId = moduleIdCounter++;
         playButton.OnInteract += delegate () { PressButton(); return false; };
         foreach (KMSelectable button in buttons)
             button.OnInteract += delegate () { PressButton(button); return false; };
