@@ -38,7 +38,7 @@ public class ipa : MonoBehaviour
         ModConfig<IpaSettings> modConfig = new ModConfig<IpaSettings>("IpaSettings");
         settings = modConfig.Settings;
         modConfig.Settings = settings;
-        moduleId = moduleIdCounter++;
+        moduleId = moduleIdCounter++; // blah blah
         playButton.OnInteract += delegate () { PressButton(); return false; };
         foreach (KMSelectable button in buttons)
             button.OnInteract += delegate () { PressButton(button); return false; };
@@ -200,6 +200,7 @@ public class ipa : MonoBehaviour
         public bool hardMode = false;
     }
 
+    #pragma warning disable 414
     private static Dictionary<string, object>[] TweaksEditorSettings = new Dictionary<string, object>[]
     {
         new Dictionary<string, object>
@@ -218,5 +219,6 @@ public class ipa : MonoBehaviour
             }
         }
     };
+    #pragma warning restore 414
 
 }

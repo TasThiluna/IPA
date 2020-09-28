@@ -8,7 +8,7 @@ class ModConfig<T>
 {
     public ModConfig(string filename)
     {
-        SettingsPath = Path.Combine(Path.Combine(Application.persistentDataPath, "Modsettings"), filename + ".json");
+        SettingsPath = @"Assets\IpaSettings.json";
     }
 
     readonly string SettingsPath = null;
