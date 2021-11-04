@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using KModkit;
 using rnd = UnityEngine.Random;
+using System.Text.RegularExpressions;
 
 public class ipa : MonoBehaviour
 {
@@ -22,9 +23,9 @@ public class ipa : MonoBehaviour
     private int solution;
     private int soundPresent;
 
-    private static readonly string[] symbols = new string[] { "p", "b", "t", "d", "c", "ɟ", "k", "g", "q", "ɢ", "ʔ", "m", "n", "ɲ", "ŋ", "ʙ", "r", "ʀ", "ⱱ", "ɾ", "f", "v", "θ", "ð", "s", "z", "ʂ", "ʐ", "x", "ɣ", "h", "ɦ", "ʋ", "ɻ", "j", "ɭ", "ʎ", "ǀ", "ɓ", "ɗ", "ʛ", "pʼ", "tʼ", "kʼ", "ʈ", "ɖ", "ɱ", "ɳ", "ɴ", "ɽ", "ɸ", "β", "ç", "ʝ", "χ", "ʁ", "ħ",  "ʕ", "ɬ", "ɮ", "ɹ", "ɰ", "l", "ʟ", "ʘ", "ǃ", "ǂ", "ǁ", "ʄ", "ɠ", "sʼ" };
+    private static readonly string[] symbols = new string[] { "p", "b", "t", "d", "c", "ɟ", "k", "g", "q", "ɢ", "ʔ", "m", "n", "ɲ", "ŋ", "ʙ", "r", "ʀ", "ⱱ", "ɾ", "f", "v", "θ", "ð", "s", "z", "ʂ", "ʐ", "x", "ɣ", "h", "ɦ", "ʋ", "ɻ", "j", "ɭ", "ʎ", "ǀ", "ɓ", "ɗ", "ʛ", "pʼ", "tʼ", "kʼ", "ʈ", "ɖ", "ɱ", "ɳ", "ɴ", "ɽ", "ɸ", "β", "ç", "ʝ", "χ", "ʁ", "ħ", "ʕ", "ɬ", "ɮ", "ɹ", "ɰ", "l", "ʟ", "ʘ", "ǃ", "ǂ", "ǁ", "ʄ", "ɠ", "sʼ" };
     private static readonly string[] positionNames = new string[9] { "top-left", "top-middle", "top-right", "middle-left", "middle-middle", "middle-right", "bottom-left", "bottom-middle", "bottom-right" };
-    private IpaSettings settings = new IpaSettings();
+    private ipaSettings settings = new ipaSettings();
     private int cap;
     private bool cantPlay = true;
     private bool cantInteract = true;
@@ -33,10 +34,24 @@ public class ipa : MonoBehaviour
     private int moduleId;
     private bool moduleSolved;
 
-    void Awake()
+    private void Awake()
     {
-        ModConfig<IpaSettings> modConfig = new ModConfig<IpaSettings>("IpaSettings");
+        ModConfig<ipaSettings> modConfig = new ModConfig<ipaSettings>("IpaSettings");
         settings = modConfig.Settings;
+        var missionDesc = KTMissionGetter.Mission.Description;
+        if (missionDesc != null)
+        {
+            var regex = new Regex(@"\[IPA\] (true|false)");
+            var match = regex.Match(missionDesc);
+            if (match.Success)
+            {
+                string[] options = match.Value.Replace("[IPA] ", "").Split(',');
+                bool[] values = new bool[options.Length];
+                for (int i = 0; i < options.Length; i++)
+                    values[i] = options[i] == "true" ? true : false;
+                settings.hardMode = values[0];
+            }
+        }
         modConfig.Settings = settings;
         moduleId = moduleIdCounter++;
         playButton.OnInteract += delegate () { PressButton(); return false; };
@@ -45,7 +60,7 @@ public class ipa : MonoBehaviour
         module.OnActivate += delegate () { StartCoroutine(ShowText()); };
     }
 
-    void Start()
+    private void Start()
     {
         foreach (TextMesh t in buttonTexts)
             t.text = "";
@@ -58,14 +73,14 @@ public class ipa : MonoBehaviour
         GenerateAnswer();
     }
 
-    void GenerateAnswer()
+    private void GenerateAnswer()
     {
         solution = rnd.Range(0, 9);
         soundPresent = rnd.Range(0, cap);
         Debug.LogFormat("[IPA #{0}] The sound being played corresponds to the symbol {1}. This symbol is on the {2} button.", moduleId, symbols[soundPresent], positionNames[solution]);
     }
 
-    void PressButton()
+    private void PressButton()
     {
         playButton.AddInteractionPunch(.2f);
         if (cantPlay)
@@ -73,7 +88,7 @@ public class ipa : MonoBehaviour
         StartCoroutine(PlayButton());
     }
 
-    IEnumerator PlayButton()
+    private IEnumerator PlayButton()
     {
         cantPlay = true;
         audio.PlaySoundAtTransform(sounds[soundPresent].name, playButton.transform);
@@ -81,7 +96,7 @@ public class ipa : MonoBehaviour
         cantPlay = false;
     }
 
-    void PressButton(KMSelectable button)
+    private void PressButton(KMSelectable button)
     {
         button.AddInteractionPunch(.2f);
         audio.PlaySoundAtTransform("button", button.transform);
@@ -105,11 +120,11 @@ public class ipa : MonoBehaviour
         }
     }
 
-    IEnumerator ShowText()
+    private IEnumerator ShowText()
     {
         var buttonNumbers = new int[] { 0, 1, 2, 5, 4, 3, 6, 7, 8 };
         var decoyCount = 0;
-        regenerateDecoys:
+    regenerateDecoys:
         var decoys = Enumerable.Range(0, cap).ToList().Shuffle().Take(8).ToArray();
         if (decoys.Any(x => x == soundPresent))
             goto regenerateDecoys;
@@ -137,7 +152,7 @@ public class ipa : MonoBehaviour
         cantInteract = false;
     }
 
-    IEnumerator HideText(bool becauseSolve)
+    private IEnumerator HideText(bool becauseSolve)
     {
         cantPlay = true;
         cantInteract = true;
@@ -156,11 +171,11 @@ public class ipa : MonoBehaviour
     }
 
     // Twitch Plays
-    #pragma warning disable 414
+#pragma warning disable 414
     private readonly string TwitchHelpMessage = "!{0} <tl/1> [Presses the button in that direction, or in that position in reading order.] !{0} play [Pressed the play button.]";
-    #pragma warning restore 414
+#pragma warning restore 414
 
-    KMSelectable[] ProcessTwitchCommand(string command)
+    private KMSelectable[] ProcessTwitchCommand(string command)
     {
         var btns = new List<KMSelectable>();
         foreach (var cmd in command.ToLowerInvariant().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
@@ -187,7 +202,7 @@ public class ipa : MonoBehaviour
         return btns.ToArray();
     }
 
-    IEnumerator TwitchHandleForcedSolve()
+    private IEnumerator TwitchHandleForcedSolve()
     {
         yield return null;
         while (cantInteract)
@@ -195,12 +210,12 @@ public class ipa : MonoBehaviour
         buttons[solution].OnInteract();
     }
 
-    class IpaSettings
+    class ipaSettings
     {
         public bool hardMode = false;
     }
 
-    #pragma warning disable 414
+#pragma warning disable 414
     private static Dictionary<string, object>[] TweaksEditorSettings = new Dictionary<string, object>[]
     {
         new Dictionary<string, object>
@@ -219,6 +234,6 @@ public class ipa : MonoBehaviour
             }
         }
     };
-    #pragma warning restore 414
+#pragma warning restore 414
 
 }
