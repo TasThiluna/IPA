@@ -172,7 +172,7 @@ public class ipa : MonoBehaviour
 
     // Twitch Plays
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = "!{0} <tl/1> [Presses the button in that direction, or in that position in reading order.] !{0} play [Pressed the play button.]";
+    private readonly string TwitchHelpMessage = "!{0} <tl/1> [Presses the button in that direction, or in that position in reading order.] !{0} play [Presses the play button.]";
 #pragma warning restore 414
 
     private KMSelectable[] ProcessTwitchCommand(string command)
